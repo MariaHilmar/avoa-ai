@@ -7,6 +7,7 @@ registra a intenção de uso para observabilidade. Ver docs/AGENTS.md.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import yaml
@@ -19,7 +20,9 @@ class ModelRouter:
         data = yaml.safe_load(config_path.read_text(encoding="utf-8"))
         self._tiers: dict[str, str] = data["tiers"]
         self._tarefas: dict[str, str] = data["tarefas"]
-        self._force_tier: str | None = data.get("force_tier")
+        # Override global: env AVOA_FORCE_TIER vence o routing.yaml (útil para
+        # baratear evals rodando tudo no tier leve, sem editar o arquivo).
+        self._force_tier: str | None = os.environ.get("AVOA_FORCE_TIER") or data.get("force_tier")
 
     def tier_de(self, tarefa: str) -> str:
         if self._force_tier:
