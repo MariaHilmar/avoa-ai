@@ -20,6 +20,7 @@ tarefas:
   gerar_criterios: medio
   gerar_casos_teste: medio
   resumir: medio
+  detectar_ambiguidade: medio   # quality gate: ambiguidade assistida por IA
   # Pesado
   analisar_requisitos: pesado
   quebrar_epico: pesado
