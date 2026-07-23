@@ -31,6 +31,12 @@ class ResultadoTeste(str, Enum):
     PULADO = "pulado"
 
 
+class Plano(str, Enum):
+    """Plano de assinatura do usuário (freemium). Ver docs/BUSINESS.md."""
+    FREE = "free"
+    PRO = "pro"
+
+
 class TipoVinculo(str, Enum):
     """Vínculos entre itens de trabalho (inspirado em Jira/Azure)."""
     DEPENDE_DE = "depende_de"
@@ -126,6 +132,30 @@ class Historia:
     vinculos: list[VinculoTrabalho] = field(default_factory=list)
     metadados: dict = field(default_factory=dict)  # origem, autor, timestamps
 
+    def adicionar_vinculo(self, tipo: TipoVinculo, alvo_id: str) -> None:
+        """Registra um vínculo (depende_de/bloqueia/...) com outra história."""
+        self.vinculos.append(VinculoTrabalho(tipo=tipo, alvo_id=alvo_id))
+
+    def alvos_por_tipo(self, tipo: TipoVinculo) -> list[str]:
+        return [v.alvo_id for v in self.vinculos if v.tipo == tipo]
+
+    def dependencias(self) -> list[str]:
+        """Ids das histórias das quais esta depende."""
+        return self.alvos_por_tipo(TipoVinculo.DEPENDE_DE)
+
+    def bloqueios(self) -> list[str]:
+        """Ids das histórias que esta bloqueia."""
+        return self.alvos_por_tipo(TipoVinculo.BLOQUEIA)
+
+
+@dataclass
+class Usuario:
+    """Usuário do Avoa. O `plano` deixa a cobrança plugável sem billing agora
+    (ver docs/BUSINESS.md); a checagem centralizada é `core.billing.pode_usar`."""
+    id: str
+    email: str = ""
+    plano: Plano = Plano.FREE
+
 
 @dataclass
 class Epico:
@@ -172,6 +202,19 @@ class WorkflowConfig:
         default_factory=lambda: ["backlog", "ready", "em_andamento", "revisao", "concluido"]
     )
     wip_limits: dict[str, int] = field(default_factory=dict)  # estado -> limite
+
+    def wip(self, historias: list["Historia"], estado_de=lambda h: h.status.value) -> dict[str, int]:
+        """WIP (contagem) por coluna/estado a partir de uma lista de histórias."""
+        contagem = {estado: 0 for estado in self.estados}
+        for h in historias:
+            estado = estado_de(h)
+            contagem[estado] = contagem.get(estado, 0) + 1
+        return contagem
+
+    def colunas_excedidas(self, historias: list["Historia"], estado_de=lambda h: h.status.value) -> dict[str, int]:
+        """Estados cujo WIP atual ultrapassa o limite configurado."""
+        wip = self.wip(historias, estado_de)
+        return {e: wip[e] for e, lim in self.wip_limits.items() if wip.get(e, 0) > lim}
 
 
 @dataclass
