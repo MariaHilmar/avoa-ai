@@ -1,0 +1,30 @@
+# Roteamento de modelos: tarefa -> tier. Ver docs/AGENTS.md.
+# Princípio: modelo mais barato para tarefa mais simples.
+# Trocar o tier de uma tarefa é mudar este arquivo, não o código.
+
+tiers:
+  leve:   claude-haiku-4-5-20251001   # extração, classificação, formatação
+  medio:  claude-sonnet-5             # redação, geração de testes, resumos
+  pesado: claude-opus-4-8             # análise, quebra de história, crítica
+
+# Override global opcional (ex.: baratear evals rodando tudo em leve):
+# force_tier: leve
+
+tarefas:
+  # Leve
+  extrair_itens: leve
+  classificar_labels: leve
+  deduplicar: leve
+  # Médio
+  redigir_historia: medio
+  gerar_criterios: medio
+  gerar_casos_teste: medio
+  resumir: medio
+  # Pesado
+  analisar_requisitos: pesado
+  quebrar_epico: pesado
+  criticar_historia: pesado
+  avaliar_pr: pesado
+  estimar_historia: pesado
+  planejar_implementacao: pesado
+  sintetizar_retrospectiva: pesado
