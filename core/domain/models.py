@@ -130,6 +130,7 @@ class Historia:
     casos_teste: list[CasoTeste] = field(default_factory=list)
     vinculos_pr: list[VinculoPR] = field(default_factory=list)
     vinculos: list[VinculoTrabalho] = field(default_factory=list)
+    regras_negocios: list[str] = field(default_factory=list)  # IDs de RN vinculadas
     metadados: dict = field(default_factory=dict)  # origem, autor, timestamps
 
     def adicionar_vinculo(self, tipo: TipoVinculo, alvo_id: str) -> None:
