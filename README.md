@@ -1,6 +1,6 @@
 # Avoa
 
-> IA que faz o processo ágil decolar - do requisito ao PR.
+> IA que faz o processo ágil decolar - do requisito a produção.
 
 **Avoa** (do nordestino *avoar* - alçar voo, decolar) é uma plataforma de agentes
 de IA para o ciclo de desenvolvimento ágil. O diferencial não é escrever código -
@@ -84,6 +84,7 @@ python -m pytest tests/ -q
 | `test_orchestrator.py` | Encadeamento de agentes + loop crítico-redator |
 | `test_github_adapter.py` | `GitHubAdapter` (`IssueTracker`): CRUD, labels, listagem, validação de repo/URL |
 | `test_github_parse.py` | Parse Gherkin/INVEST do body → critérios (`tests/fixtures/github_bodies/`) |
+| `test_github_codehost.py` | `GitHubCodeHost` (`CodeHost`): PR, diff (com truncagem), comentário, validação |
 | `test_github_codehost.py` | `GitHubCodeHost` (`PullRequest`, diff, stubs tipados) |
 
 Fixtures em `tests/fixtures/github_bodies/` usam corpos no formato das issues do

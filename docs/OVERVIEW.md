@@ -30,7 +30,7 @@ O núcleo conhece apenas interfaces; cada ferramenta é um adaptador:
 | Port | Papel | Estado no núcleo |
 |---|---|---|
 | `IssueTracker` | issues, épicos, sprints | Adaptador GitHub + parse de body (`github_parse`) |
-| `CodeHost` | PRs, commits, merges, diff | Port definida; adaptador GitHub entra com o Revisor de PR (Fase 4) |
+| `CodeHost` | PRs, commits, merges, diff | Port + `GitHubCodeHost` (PR/diff/comentário) na Fase 4 |
 | `CodingAgent` | entrega de contexto para ferramentas de código | Port definida (Copiloto / Bridge) |
 | `Repository` | persistência dos dados do próprio Avoa | Memória + SQLite |
 
