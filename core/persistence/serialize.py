@@ -3,6 +3,10 @@
 Permite persistir as entidades do Avoa num backend baseado em texto (SQLite
 hoje, Postgres/Supabase depois) e reconstruí-las. Trata Enums, datetime e
 dataclasses aninhadas via anotações de tipo. Ver docs/PERSISTENCE.md.
+
+Só registra dataclasses de ``core.domain.models``. Tipos de qualidade com
+predicados (``ChecklistAvaliacao``, ``ItemChecklist``) não são persistíveis
+e não entram no registro - evita colisão de nome com ``models.Checklist``.
 """
 
 from __future__ import annotations
@@ -13,15 +17,28 @@ import typing
 from datetime import datetime
 
 from core.domain import models
-from core.quality import checklists
 
 # Registro nome->classe das dataclasses conhecidas (para reconstrução).
 _REGISTRO: dict[str, type] = {}
-for _mod in (models, checklists):
-    for _nome in dir(_mod):
-        _obj = getattr(_mod, _nome)
-        if isinstance(_obj, type) and dataclasses.is_dataclass(_obj):
-            _REGISTRO[_nome] = _obj
+
+
+def _registrar_dataclasses(mod) -> None:
+    """Registra dataclasses do módulo; falha se houver colisão de nome."""
+    for nome in dir(mod):
+        obj = getattr(mod, nome)
+        if not (isinstance(obj, type) and dataclasses.is_dataclass(obj)):
+            continue
+        existente = _REGISTRO.get(nome)
+        if existente is not None and existente is not obj:
+            raise RuntimeError(
+                f"Colisão no registro de serialização: {nome!r} "
+                f"já aponta para {existente.__module__}.{existente.__qualname__}, "
+                f"não pode registrar {obj.__module__}.{obj.__qualname__}"
+            )
+        _REGISTRO[nome] = obj
+
+
+_registrar_dataclasses(models)
 
 
 def serialize(obj):
