@@ -1,8 +1,14 @@
-"""Definition of Ready / Definition of Done — núcleo, não módulo.
+"""Definition of Ready / Definition of Done - núcleo, não módulo.
 
-Uma checklist é uma lista de itens nomeados, cada um com um predicado sobre a
-história. O Crítico usa a DoR para marcar `Historia.pronta`; o Revisor de PR
-(Fase 4) usa a DoD como base do "atende aos critérios?". Ver docs/AGENTS.md.
+Há dois conceitos distintos (não misturar):
+
+- ``core.domain.models.Checklist`` - entidade persistível (id, nome, itens: list[str]).
+  Configuração DoR/DoD que o Crítico aplica; serializa no repositório.
+- ``ChecklistAvaliacao`` (este módulo) - runtime com predicados sobre ``Historia``.
+  Não entra no registro de serialização (predicados não são JSON).
+
+O Crítico usa a DoR para marcar ``Historia.pronta``; o Revisor de PR (Fase 4)
+usa a DoD como base do "atende aos critérios?". Ver docs/AGENTS.md.
 """
 
 from __future__ import annotations
@@ -22,7 +28,9 @@ class ItemChecklist:
 
 
 @dataclass
-class Checklist:
+class ChecklistAvaliacao:
+    """Checklist executável: itens com predicado sobre a história."""
+
     nome: str
     itens: list[ItemChecklist] = field(default_factory=list)
 
@@ -39,9 +47,9 @@ def _tem_narrativa_invest(h: Historia) -> bool:
     return "como" in n and "quero" in n and "para" in n
 
 
-def definition_of_ready() -> Checklist:
+def definition_of_ready() -> ChecklistAvaliacao:
     """DoR padrão: o que uma história precisa para entrar em desenvolvimento."""
-    return Checklist(
+    return ChecklistAvaliacao(
         "Definition of Ready",
         [
             ItemChecklist("narrativa no formato INVEST", _tem_narrativa_invest),
@@ -51,9 +59,9 @@ def definition_of_ready() -> Checklist:
     )
 
 
-def definition_of_done() -> Checklist:
+def definition_of_done() -> ChecklistAvaliacao:
     """DoD padrão: base do 'atende?' do Revisor de PR (Fase 4)."""
-    return Checklist(
+    return ChecklistAvaliacao(
         "Definition of Done",
         [
             ItemChecklist("critérios de aceite definidos", lambda h: bool(h.criterios_aceite)),
@@ -62,7 +70,9 @@ def definition_of_done() -> Checklist:
     )
 
 
-def aplicar_dor(historia: Historia, dor: Checklist | None = None) -> tuple[bool, list[str]]:
+def aplicar_dor(
+    historia: Historia, dor: ChecklistAvaliacao | None = None
+) -> tuple[bool, list[str]]:
     """Aplica a DoR e marca `historia.pronta`. Devolve (pronta, faltantes)."""
     dor = dor or definition_of_ready()
     passou, faltantes = dor.avaliar(historia)

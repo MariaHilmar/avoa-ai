@@ -5,6 +5,7 @@ from __future__ import annotations
 import httpx
 import pytest
 
+from core.integrations.dtos import PullRequest, StatusChecks
 from core.integrations.github_adapter import RepoInvalidoError
 from core.integrations.github_codehost import (
     GitHubCodeHost,
@@ -107,10 +108,11 @@ def test_buscar_pr(host: GitHubCodeHost):
 
     fake.get_handler = _get
     pr = host.buscar_pr(11)
-    assert pr["numero"] == 11
-    assert pr["titulo"] == "feat(testes)"
-    assert "Fecha #27" in pr["body"]
-    assert pr["merged"] is True
+    assert isinstance(pr, PullRequest)
+    assert pr.numero == 11
+    assert pr.titulo == "feat(testes)"
+    assert "Fecha #27" in pr.body
+    assert pr.merged is True
 
 
 def test_buscar_diff_trunca(host: GitHubCodeHost):
@@ -130,7 +132,10 @@ def test_buscar_diff_trunca(host: GitHubCodeHost):
 
 def test_stubs_commits_e_checks(host: GitHubCodeHost):
     assert host.listar_commits(11) == []
-    assert host.status_checks(11) == {}
+    checks = host.status_checks(11)
+    assert isinstance(checks, StatusChecks)
+    assert checks.disponivel is False
+    assert checks.checks == ()
 
 
 def test_postar_comentario(host: GitHubCodeHost):

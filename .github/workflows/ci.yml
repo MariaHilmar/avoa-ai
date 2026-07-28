@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar deps (versoes fixas, wheels)
+        run: |
+          pip install \
+            "pytest==8.3.4" "ruff==0.8.4" "mypy==1.13.0" \
+            "httpx==0.28.1" "anthropic==0.42.0" "pyyaml==6.0.2" \
+            "pydantic==2.10.4" "fastapi==0.115.6" "uvicorn[standard]==0.34.0" \
+            --only-binary :all:
+
+      - name: Pytest
+        run: python -m pytest tests/ -q
+        env:
+          PYTHONPATH: .

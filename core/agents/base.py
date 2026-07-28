@@ -8,8 +8,13 @@ contexto e devolve um contexto atualizado. Ver docs/AGENTS.md.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from core.llm.client import LLMClient
+
+# Contexto tipado de forma aberta: chaves evoluem por fluxo (Refina, Reunião…).
+# Módulos podem estreitar com TypedDict (ex.: avoa_refine.contexto_tipos).
+Contexto = dict[str, Any]
 
 
 class Agent(ABC):
@@ -26,14 +31,14 @@ class Agent(ABC):
         return self.__class__.__name__
 
     @abstractmethod
-    def montar_prompt(self, contexto: dict) -> str:
+    def montar_prompt(self, contexto: Contexto) -> str:
         """Constrói o prompt do usuário a partir do contexto."""
 
     @abstractmethod
-    def aplicar(self, contexto: dict, resposta: str) -> dict:
+    def aplicar(self, contexto: Contexto, resposta: str) -> Contexto:
         """Integra a resposta do LLM ao contexto e o devolve."""
 
-    def run(self, contexto: dict) -> dict:
+    def run(self, contexto: Contexto) -> Contexto:
         prompt = self.montar_prompt(contexto)
         resposta = self.llm.complete(self.tarefa, self.system, prompt)
         return self.aplicar(contexto, resposta)
