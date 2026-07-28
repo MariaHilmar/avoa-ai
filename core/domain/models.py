@@ -148,6 +148,21 @@ class Historia:
         """Ids das histórias que esta bloqueia."""
         return self.alvos_por_tipo(TipoVinculo.BLOQUEIA)
 
+    def casos_por_criterio(self, criterio_id: str) -> list[CasoTeste]:
+        """Casos de teste que apontam para o `CriterioAceite` de origem."""
+        cid = str(criterio_id).strip()
+        return [c for c in self.casos_teste if c.criterio_origem_id == cid]
+
+    def indice_casos_por_criterio(self) -> dict[str, list[CasoTeste]]:
+        """Agrupa casos por `criterio_origem_id` (órfãos ficam de fora)."""
+        indice: dict[str, list[CasoTeste]] = {}
+        for caso in self.casos_teste:
+            origem = caso.criterio_origem_id
+            if not origem:
+                continue
+            indice.setdefault(origem, []).append(caso)
+        return indice
+
 
 @dataclass
 class Usuario:
