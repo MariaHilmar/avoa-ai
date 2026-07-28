@@ -133,6 +133,7 @@ def test_validar_repo_aceita_owner_repo():
         "",
         "so-owner",
         "../etc/passwd",
+        "../evil",
         "a/b/c",
         "owner/repo?x=1",
         "owner/repo#frag",

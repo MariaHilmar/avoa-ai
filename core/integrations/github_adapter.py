@@ -36,6 +36,11 @@ def validar_repo(repo: str) -> str:
         raise RepoInvalidoError(
             f"repo inválido: {repo!r} (esperado 'owner/repo')"
         )
+    owner, name = repo.split("/", 1)
+    if owner in {".", ".."} or name in {".", ".."} or ".." in owner or ".." in name:
+        raise RepoInvalidoError(
+            f"repo inválido: {repo!r} (path traversal não permitido)"
+        )
     return repo
 
 
