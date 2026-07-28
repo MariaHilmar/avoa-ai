@@ -118,7 +118,7 @@ class GitHubAdapter:
     def vincular_pr(self, id_externo: str, pr_url: str) -> None:
         id_ = self._validar_issue_id(id_externo)
         url = (pr_url or "").strip()
-        if not url.startswith(("https://github.com/", "http://github.com/")):
+        if not url.startswith("https://github.com/"):
             raise ValueError(
                 f"pr_url inválida: {pr_url!r} (esperado URL https://github.com/...)"
             )

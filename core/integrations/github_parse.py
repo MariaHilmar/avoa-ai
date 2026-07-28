@@ -73,7 +73,7 @@ def _tem_passo_gherkin(texto: str) -> bool:
 
 def _linha_inicia_cenario(linha: str) -> bool:
     s = linha.strip().lower()
-    return s.startswith("dado ") or s.startswith("given ")
+    return s.startswith(("dado ", "given "))
 
 
 def _cenarios_gherkin(texto: str) -> list[str]:
@@ -110,26 +110,35 @@ def _cenarios_gherkin(texto: str) -> list[str]:
     return out or [texto]
 
 
+def _consumir_fence(linhas: list[str], i: int) -> tuple[str | None, int]:
+    """Lê um fence gherkin fechado; devolve (conteúdo, próximo índice)."""
+    tag = linhas[i].strip()[3:].strip().lower()
+    if tag not in ("", "gherkin"):
+        i += 1
+        while i < len(linhas) and not linhas[i].strip().startswith("```"):
+            i += 1
+        return None, i + 1
+
+    i += 1
+    buf: list[str] = []
+    while i < len(linhas) and not linhas[i].strip().startswith("```"):
+        buf.append(linhas[i])
+        i += 1
+    if i >= len(linhas):
+        return None, i
+    return "\n".join(buf), i + 1
+
+
 def _blocos_fenced_gherkin(texto: str) -> list[str]:
     blocos: list[str] = []
     linhas = texto.splitlines()
     i = 0
     while i < len(linhas):
-        raw = linhas[i].strip()
-        if raw.startswith("```"):
-            tag = raw[3:].strip().lower()
-            if tag in ("", "gherkin"):
-                i += 1
-                buf: list[str] = []
-                while i < len(linhas) and not linhas[i].strip().startswith("```"):
-                    buf.append(linhas[i])
-                    i += 1
-                if i < len(linhas):
-                    blocos.append("\n".join(buf))
-            else:
-                i += 1
-                while i < len(linhas) and not linhas[i].strip().startswith("```"):
-                    i += 1
+        if linhas[i].strip().startswith("```"):
+            conteudo, i = _consumir_fence(linhas, i)
+            if conteudo is not None:
+                blocos.append(conteudo)
+            continue
         i += 1
     return blocos
 
@@ -152,7 +161,7 @@ def _itens_bullet(bloco: str) -> list[str]:
     atual: list[str] = []
     for linha in bloco.splitlines():
         stripped = linha.lstrip()
-        if stripped.startswith("- ") or stripped.startswith("* "):
+        if stripped.startswith(("- ", "* ")):
             if atual:
                 itens.append("\n".join(atual).strip())
             atual = [stripped[2:]]
