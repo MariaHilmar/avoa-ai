@@ -1,7 +1,7 @@
 [project]
 name = "avoa"
 version = "0.0.1"
-description = "IA que faz o processo ágil decolar — do requisito ao PR."
+description = "IA que faz o processo ágil decolar - do requisito a produção."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
