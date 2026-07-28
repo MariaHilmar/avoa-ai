@@ -13,6 +13,7 @@ import re
 
 import httpx
 
+from core.integrations.dtos import CommitInfo, PullRequest, StatusChecks
 from core.integrations.github_adapter import RepoInvalidoError, validar_repo
 
 _API = "https://api.github.com"
@@ -59,23 +60,23 @@ class GitHubCodeHost:
             )
         return n
 
-    def buscar_pr(self, numero: int) -> dict:
+    def buscar_pr(self, numero: int) -> PullRequest:
         """Metadados do PR (título, body, url, state, etc.)."""
         n = self._validar_pr(numero)
         r = self._http.get(f"/repos/{self._repo}/pulls/{n}")
         r.raise_for_status()
         data = r.json()
-        return {
-            "numero": data.get("number", n),
-            "titulo": data.get("title") or "",
-            "body": data.get("body") or "",
-            "url": data.get("html_url") or "",
-            "state": data.get("state") or "",
-            "merged": bool(data.get("merged")),
-            "head_sha": (data.get("head") or {}).get("sha") or "",
-            "base_ref": (data.get("base") or {}).get("ref") or "",
-            "user": ((data.get("user") or {}).get("login") or ""),
-        }
+        return PullRequest(
+            numero=int(data.get("number", n)),
+            titulo=data.get("title") or "",
+            body=data.get("body") or "",
+            url=data.get("html_url") or "",
+            state=data.get("state") or "",
+            merged=bool(data.get("merged")),
+            head_sha=(data.get("head") or {}).get("sha") or "",
+            base_ref=(data.get("base") or {}).get("ref") or "",
+            user=((data.get("user") or {}).get("login") or ""),
+        )
 
     def buscar_diff(self, pr_numero: int) -> str:
         """Unified diff do PR (truncado para caber no prompt do Crítico)."""
@@ -97,15 +98,18 @@ class GitHubCodeHost:
             )
         return texto
 
-    def listar_commits(self, pr_numero: int) -> list[dict]:
-        """Stub Fase 4: lista vazia (sem bloquear o marco)."""
+    def listar_commits(self, pr_numero: int) -> list[CommitInfo]:
+        """Stub Fase 4: lista vazia (sem bloquear o marco).
+
+        Marcado como stub até a issue de webhooks/Checks (#31) / commits reais.
+        """
         self._validar_pr(pr_numero)
         return []
 
-    def status_checks(self, pr_numero: int) -> dict:
-        """Stub Fase 4: sem checks (webhook/Checks = issue #31)."""
+    def status_checks(self, pr_numero: int) -> StatusChecks:
+        """Stub Fase 4: checks indisponíveis (webhook/Checks = issue #31)."""
         self._validar_pr(pr_numero)
-        return {}
+        return StatusChecks(disponivel=False)
 
     def postar_comentario(self, pr_numero: int, corpo: str) -> str:
         """Comenta no PR (issue comments API). Retorna URL do comentário.

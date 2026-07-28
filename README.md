@@ -34,9 +34,10 @@ O Avoa é uma família de sistemas sobre este núcleo compartilhado:
 | `core/integrations` | Ports (`IssueTracker`, `CodeHost`, `CodingAgent`, `Repository`) + adaptadores GitHub |
 | `core/integrations/github_parse.py` | Parse do body da issue (INVEST + Gherkin) → `Historia` |
 | `core/persistence` | `Repository` (memória + SQLite) e projeção de issues |
-| `core/quality` | Checklists DoR / DoD |
+| `core/quality` | `ChecklistAvaliacao` DoR/DoD (runtime); `Checklist` no domínio |
 | `core/billing` | Flag de plano + `pode_usar` (sem Stripe ainda) |
 | `core/observability` | Contagem de uso (tokens/custo) |
+| `core/integrations/dtos.py` | DTOs tipados (`PullRequest`, `StatusChecks`, …) |
 | `tests/` | Suite automatizada do núcleo (ver abaixo) |
 | `evals/` | Convenção de evals de agentes (casos reais vivem nos módulos, ex. Refine) |
 
@@ -78,10 +79,12 @@ python -m pytest tests/ -q
 | Arquivo | O que valida |
 |---|---|
 | `test_nucleo.py` | Domínio (vínculos, WIP, DoR/DoD, `casos_por_criterio`), `pode_usar`, Repository, projeção |
+| `test_serialize.py` | Round-trip JSON + `Checklist` de domínio (sem colisão com qualidade) |
 | `test_router.py` | Roteamento tarefa → tier / modelo |
 | `test_orchestrator.py` | Encadeamento de agentes + loop crítico-redator |
 | `test_github_adapter.py` | `GitHubAdapter` (`IssueTracker`): CRUD, labels, listagem, validação de repo/URL |
 | `test_github_parse.py` | Parse Gherkin/INVEST do body → critérios (`tests/fixtures/github_bodies/`) |
+| `test_github_codehost.py` | `GitHubCodeHost` (`PullRequest`, diff, stubs tipados) |
 
 Fixtures em `tests/fixtures/github_bodies/` usam corpos no formato das issues do
 backlog Avoa (Project #9), para o parse não regressar no dogfood do Quality Gate.

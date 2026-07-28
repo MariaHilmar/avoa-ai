@@ -1,4 +1,4 @@
-"""Portas (interfaces) das integrações do Avoa — Arquitetura Hexagonal.
+"""Portas (interfaces) das integrações do Avoa - Arquitetura Hexagonal.
 
 O núcleo só conhece estas interfaces, nunca uma ferramenta concreta.
 Cada ferramenta é um adaptador que as implementa. Ver docs/INTEGRATIONS.md.
@@ -14,6 +14,12 @@ from __future__ import annotations
 from typing import Protocol, runtime_checkable
 
 from core.domain.models import Historia, Sprint
+from core.integrations.dtos import (
+    CommitInfo,
+    PullRequest,
+    ResultadoCodingAgent,
+    StatusChecks,
+)
 
 
 @runtime_checkable
@@ -32,10 +38,10 @@ class IssueTracker(Protocol):
 class CodeHost(Protocol):
     """Leitura de informações de código: PRs, commits, merges, diff, checks."""
 
-    def buscar_pr(self, numero: int) -> dict: ...
-    def listar_commits(self, pr_numero: int) -> list[dict]: ...
+    def buscar_pr(self, numero: int) -> PullRequest: ...
+    def listar_commits(self, pr_numero: int) -> list[CommitInfo]: ...
     def buscar_diff(self, pr_numero: int) -> str: ...
-    def status_checks(self, pr_numero: int) -> dict: ...
+    def status_checks(self, pr_numero: int) -> StatusChecks: ...
 
 
 @runtime_checkable
@@ -44,18 +50,18 @@ class CodingAgent(Protocol):
 
     Nível 1 (comece aqui): entrega por artefato (SPEC.md / comentário na issue).
     Nível 2 (depois): integração via SDK headless / hooks.
-    O Avoa NÃO gera código — apenas entrega o contexto do requisito.
+    O Avoa NÃO gera código - apenas entrega o contexto do requisito.
     """
 
     def enviar_spec(self, historia: Historia, spec: str) -> str: ...
-    def receber_resultado(self, referencia: str) -> dict: ...
+    def receber_resultado(self, referencia: str) -> ResultadoCodingAgent: ...
 
 
 @runtime_checkable
 class Repository(Protocol):
     """Persistência dos dados DO AVOA (rascunhos, métricas, poker, traces).
 
-    NÃO é a fonte da verdade das issues — essa é o IssueTracker do cliente.
+    NÃO é a fonte da verdade das issues - essa é o IssueTracker do cliente.
     Backend plugável: SQLite (dev) ou Postgres/Supabase (produção).
     Ver docs/PERSISTENCE.md.
     """
