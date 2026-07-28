@@ -88,6 +88,38 @@ def test_dod_base_do_revisor():
     assert passou is False and "tem casos de teste vinculados" in faltantes
 
 
+# ---- Rastreabilidade caso ↔ critério (#24) ---------------------------------
+
+def test_casos_por_criterio_e_indice():
+    from core.domain.models import CasoTeste
+
+    h = Historia(
+        id="h1",
+        titulo="Recuperar senha",
+        criterios_aceite=[
+            CriterioAceite(id="c1", descricao="", formato_gherkin="Dado a\nQuando b\nEntão c"),
+            CriterioAceite(id="c2", descricao="", formato_gherkin="Dado x\nQuando y\nEntão z"),
+        ],
+        casos_teste=[
+            CasoTeste(id="t1", titulo="feliz", passos=["p"], resultado_esperado="ok",
+                      criterio_origem_id="c1"),
+            CasoTeste(id="t2", titulo="borda", passos=["p"], resultado_esperado="msg",
+                      criterio_origem_id="c1"),
+            CasoTeste(id="t3", titulo="outro", passos=["p"], resultado_esperado="z",
+                      criterio_origem_id="c2"),
+            CasoTeste(id="t4", titulo="orfao", passos=["p"], resultado_esperado="?",
+                      criterio_origem_id=None),
+        ],
+    )
+    assert [c.id for c in h.casos_por_criterio("c1")] == ["t1", "t2"]
+    assert [c.id for c in h.casos_por_criterio("c2")] == ["t3"]
+    assert h.casos_por_criterio("inexistente") == []
+    indice = h.indice_casos_por_criterio()
+    assert set(indice) == {"c1", "c2"}
+    assert len(indice["c1"]) == 2
+    assert all(c.criterio_origem_id for casos in indice.values() for c in casos)
+
+
 # ---- #55 Repository (memory + sqlite, incl. append-only) --------------------
 
 def _round_trip(repo):
