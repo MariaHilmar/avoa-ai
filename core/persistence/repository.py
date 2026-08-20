@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from dataclasses import asdict, is_dataclass
 
 from core.persistence.serialize import deserialize, serialize
 
@@ -23,7 +22,7 @@ def _tipo_nome(tipo: type) -> str:
 
 def _id_de(entidade: object) -> str:
     if hasattr(entidade, "id"):
-        return str(getattr(entidade, "id"))
+        return str(entidade.id)
     raise ValueError("Entidade sem atributo 'id' não pode ser salva.")
 
 

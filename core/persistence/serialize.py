@@ -61,7 +61,7 @@ def serialize(obj):
 def _coagir(valor, anotacao):
     """Coage um valor bruto para o tipo anotado (Enum/dataclass/list)."""
     origem = typing.get_origin(anotacao)
-    if origem in (list, typing.List) and isinstance(valor, list):
+    if origem is list and isinstance(valor, list):
         (arg,) = typing.get_args(anotacao) or (object,)
         return [_coagir(v, arg) for v in valor]
     if isinstance(anotacao, type) and issubclass(anotacao, enum.Enum):

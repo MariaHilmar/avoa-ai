@@ -219,7 +219,7 @@ class WorkflowConfig:
     )
     wip_limits: dict[str, int] = field(default_factory=dict)  # estado -> limite
 
-    def wip(self, historias: list["Historia"], estado_de=lambda h: h.status.value) -> dict[str, int]:
+    def wip(self, historias: list[Historia], estado_de=lambda h: h.status.value) -> dict[str, int]:
         """WIP (contagem) por coluna/estado a partir de uma lista de histórias."""
         contagem = {estado: 0 for estado in self.estados}
         for h in historias:
@@ -227,7 +227,7 @@ class WorkflowConfig:
             contagem[estado] = contagem.get(estado, 0) + 1
         return contagem
 
-    def colunas_excedidas(self, historias: list["Historia"], estado_de=lambda h: h.status.value) -> dict[str, int]:
+    def colunas_excedidas(self, historias: list[Historia], estado_de=lambda h: h.status.value) -> dict[str, int]:
         """Estados cujo WIP atual ultrapassa o limite configurado."""
         wip = self.wip(historias, estado_de)
         return {e: wip[e] for e, lim in self.wip_limits.items() if wip.get(e, 0) > lim}
@@ -235,7 +235,7 @@ class WorkflowConfig:
 
 @dataclass
 class Metrica:
-    tipo: "TipoMetrica"
+    tipo: TipoMetrica
     valor: float
     periodo: str
     sprint_id: str | None = None

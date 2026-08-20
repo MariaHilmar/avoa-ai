@@ -8,9 +8,9 @@ import pytest
 from core.integrations.dtos import PullRequest, StatusChecks
 from core.integrations.github_adapter import RepoInvalidoError
 from core.integrations.github_codehost import (
+    _DIFF_MAX_CHARS,
     GitHubCodeHost,
     PrNumeroInvalidoError,
-    _DIFF_MAX_CHARS,
 )
 
 

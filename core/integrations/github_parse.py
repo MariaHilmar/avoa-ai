@@ -38,8 +38,7 @@ def _limpar_titulo_secao(linha: str) -> str:
         s = s[2:-2]
     if s.startswith("#"):
         s = s.lstrip("#").strip()
-    if s.endswith(":"):
-        s = s[:-1]
+    s = s.removesuffix(":")
     return s.strip().lower()
 
 
