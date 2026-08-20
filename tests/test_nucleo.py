@@ -1,6 +1,5 @@
 """Testes do núcleo compartilhado complementado (issues F0 #8, #48-51, #55, #56)."""
 
-from datetime import datetime
 
 from core.billing import pode_usar
 from core.domain.consultas import (
@@ -21,7 +20,6 @@ from core.domain.models import (
 from core.persistence.projecao import ProjecaoIssues
 from core.persistence.repository import InMemoryRepository, SQLiteRepository
 from core.quality.checklists import aplicar_dor, definition_of_done
-
 
 # ---- #8 flag de plano -------------------------------------------------------
 

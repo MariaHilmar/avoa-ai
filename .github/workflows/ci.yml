@@ -23,6 +23,9 @@ jobs:
             "pydantic==2.10.4" "fastapi==0.115.6" "uvicorn[standard]==0.34.0" \
             --only-binary :all:
 
+      - name: Ruff
+        run: python -m ruff check core tests
+
       - name: Pytest
         run: python -m pytest tests/ -q
         env:

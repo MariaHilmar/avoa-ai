@@ -47,7 +47,7 @@ def test_colisao_de_nome_no_registro_falha():
     """Guarda: dois dataclasses com o mesmo __name__ não podem coexistir no registro."""
 
     @dataclasses.dataclass
-    class Checklist:  # noqa: F811 - colisão intencional com models.Checklist
+    class Checklist:
         id: str
 
     fake = types.ModuleType("fake_colisao")

@@ -10,11 +10,12 @@ from __future__ import annotations
 
 import os
 import re
+from typing import Self
 
 import httpx
 
 from core.integrations.dtos import CommitInfo, PullRequest, StatusChecks
-from core.integrations.github_adapter import RepoInvalidoError, validar_repo
+from core.integrations.github_adapter import validar_repo
 
 _API = "https://api.github.com"
 _RE_PR = re.compile(r"^\d+$")
@@ -134,7 +135,7 @@ class GitHubCodeHost:
     def close(self) -> None:
         self._http.close()
 
-    def __enter__(self) -> GitHubCodeHost:
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *args: object) -> None:
