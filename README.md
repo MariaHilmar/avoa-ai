@@ -1,4 +1,4 @@
-# Avoa
+# Avoa [Em construção]
 
 > IA que faz o processo ágil decolar - do requisito a produção.
 
@@ -7,13 +7,10 @@ de IA para o ciclo de desenvolvimento ágil. O diferencial não é escrever cód
 é dominar o **processo**: requisitos, critérios de aceite, ritmo de time e dados de
 gestão, o lado em que a IA generativa ainda erra mais.
 
-Este repositório é o **núcleo open source** do Avoa: um pequeno framework para
-construir agentes de IA sobre um domínio de trabalho ágil, com roteamento de
+Framework para construir agentes de IA sobre um domínio de trabalho ágil, com roteamento de
 modelos por custo e integração via Ports & Adapters.
 
 ## O ecossistema (visão geral)
-
-O Avoa é uma família de sistemas sobre este núcleo compartilhado:
 
 - **Refine** - refina requisitos: história crua → INVEST + critérios em Gherkin;
   Quality Gate ("SonarQube para requisitos"); gerador de testes.
@@ -21,7 +18,6 @@ O Avoa é uma família de sistemas sobre este núcleo compartilhado:
 - **Metrics** - board/Kanban e indicadores de processo (lead time, cycle time...).
 - **Bridge** - leva o contexto do requisito para ferramentas de código.
 
-> Os sistemas comerciais são desenvolvidos à parte. Este repositório expõe apenas
 > o framework técnico.
 
 ## O que tem aqui
